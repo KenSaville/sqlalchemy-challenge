@@ -34,34 +34,35 @@ def welcome():
     """List all available api routes."""
     return (
         f"Available Routes:<br/>"
-        f"/api/v1.0/date/precipitation_on_date/<date><br/>"
+        f"/api/v1.0/date/precipitation/<date><br/>"
         f"/api/v1.0/stations<br/>"
-        f"/api/v1.0/temperature<br/>"
+        f"/api/v1.0/temp<br/>"
         f"/api/v1.0/temp_start_date/<date><br/>"
         f"/api/v1.0/temp_start_end/<date_start>/<date_end>"
     )
 
-#@app.route("/api/v1.0/date/precipitation/<date>")
-@app.route("/api/v1.0/date/precipitation_on_date/<date>")
+
+@app.route("/api/v1.0/date/precipitation/<date>")
 def precipitation(date):
     # Create a session connecting DB
-    session = Session(engine)
+	session = Session(engine)
 
-    """Return a list of precipitation amounts"""
+	"""Return a list of precipitation amounts"""
     # Query all precipitation amounts
-    precip = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date == date).all()
+	precip = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date == date).all()
 
-    session.close()
+	session.close()
 
- # Createdictionary from the row data and append to a list of dates and precipitation
-    date_precip = []
-    for date, precipitation in precip:
-        precip_dict = {}
-        precip_dict["date"] = date
-        precip_dict["precipitation"] = precipitation
-        date_precip.append(precip_dict)
+	# Create dictionary from row data and append to a list of dates and precipitation
+    
+	date_precip = []
+	for date, precipitation in precip:
+		precip_dict = {}
+		precip_dict["date"] = date
+		precip_dict["precipitation"] = precipitation
+		date_precip.append(precip_dict)
 
-    return jsonify(date_precip)
+	return jsonify(date_precip)
 
 
 @app.route("/api/v1.0/stations")
@@ -78,7 +79,7 @@ def stations():
     return jsonify(station_results)
 
 
-@app.route("/api/v1.0/temperature")
+@app.route("/api/v1.0/temp")
 
 def tobs():
     # Create our session (link) from Python to the DB
@@ -95,27 +96,28 @@ def tobs():
     for date, temp in temp_obs:
         temp_obs_dict = {}
         temp_obs_dict["date"] = date
-        temp_obs_dict["temperature"] = temperature_observation
+        temp_obs_dict["temperature"] = temp_obs
         tobs_list.append(temp_obs_dict)
 
     return jsonify(tobs_list)
 
 
-@app.route("/api/v1.0/temperature_given_start_date/<date>")
+@app.route("/api/v1.0/temp_start_date/<date>")
 def temp_start_date(date):
     # Create session
     session = Session(engine)
 
+	
     """Return a list of temperatures"""
     # Query stations
-    tempe_start_date_results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).filter(Measurement.date >= date).all()
+    temp_start_date_results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).filter(Measurement.date >= date).all()
 
     session.close()
 
     return jsonify(temp_start_date_results)
 
 
-@app.route("/api/v1.0/temperature_given_start_end/<date_start>/<date_end>")
+@app.route("/api/v1.0/temp_start_end/<date_start>/<date_end>")
 def temperature_start_end(date_start, date_end):
     # Create our session (link) from Python to the DB
     session = Session(engine)
@@ -127,7 +129,7 @@ def temperature_start_end(date_start, date_end):
     session.close()
 
     return jsonify(temperature_start_end_results)
-# @app.route("/api/v1.0/<start>/<end>")
+
 
 
 if __name__ == '__main__':
