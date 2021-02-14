@@ -40,7 +40,7 @@
 
   * Plotted the results as a histogram with `bins=12`.
 
-    ![station-temps](Images/station-temps.png)
+    ![station-temps](Images/station_temps.png)
 
 - - -
 
